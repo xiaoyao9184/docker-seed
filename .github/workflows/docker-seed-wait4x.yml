@@ -50,7 +50,7 @@ jobs:
           file: ./wait4x/Dockerfile
           platforms: linux/amd64
           build-args: |
-            wait4x_VERSION=2.5.0
+            WAIT4X_VERSION=2.5.0
             SEED_VERSION=${{ steps.short.outputs.sha_short }}
           tags: xiaoyao9184/docker-seed-wait4x:2.5.0-${{ steps.short.outputs.sha_short }}
           push: true
@@ -63,7 +63,7 @@ jobs:
           file: ./wait4x/Dockerfile
           platforms: linux/amd64
           build-args: |
-            wait4x_VERSION=2.5.0
+            WAIT4X_VERSION=2.5.0
             SEED_VERSION=${{ steps.tag.outputs.tag }}
           tags: xiaoyao9184/docker-seed-wait4x:2.5.0-${{ steps.tag.outputs.tag }}
           push: true

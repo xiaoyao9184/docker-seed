@@ -1,0 +1,26 @@
+---
+
+- name: param
+  hosts: localhost
+  connection: local
+  tasks: 
+    
+    - name: print var
+      debug: 
+        msg: "wait {{ timeout }}s for {{ host }} each {{ delay }}s"
+  
+    - name: wait for port
+      wait_for:
+        host: "{{ host }}"
+        port: 80
+        delay: "{{ delay }}"
+        timeout: "{{ timeout }}"
+
+    - name: add service to stack
+      docker_stack:
+        state: present
+        name: "{{ ansible_env.DOCKER_STACK_NAME }}"
+        compose:
+          - "/workspace/docker-compose-swarm.yml"
+
+  

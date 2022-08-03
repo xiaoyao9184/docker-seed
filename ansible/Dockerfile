@@ -5,9 +5,9 @@ FROM alpine:3.16
 ARG ANSIBLE_VERSION=2.9.27
 ARG SEED_VERSION=dev
 
-RUN apk add --update --no-cache sudo bash py-pip openssl docker-cli
+RUN apk add --update --no-cache sudo bash py-pip openssl docker-cli docker-compose
 
-RUN pip install --upgrade pip jsondiff pyyaml
+RUN pip install --upgrade pip docker jsondiff pyyaml
 RUN pip install ansible==${ANSIBLE_VERSION}
 RUN mkdir -p /etc/ansible \
     && echo 'localhost' > /etc/ansible/hosts

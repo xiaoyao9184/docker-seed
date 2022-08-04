@@ -12,7 +12,8 @@ RUN pip install ansible==${ANSIBLE_VERSION}
 RUN mkdir -p /etc/ansible \
     && echo 'localhost' > /etc/ansible/hosts
 
-RUN ansible-galaxy collection install community.docker
+RUN ansible-galaxy collection install community.docker \
+    && ansible-galaxy collection install community.general
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh
 COPY docker-deploy.sh /docker-deploy.sh

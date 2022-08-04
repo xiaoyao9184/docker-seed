@@ -7,7 +7,13 @@ ARG SEED_VERSION=dev
 
 RUN apk add --update --no-cache sudo bash py-pip openssl docker-cli docker-compose
 
-RUN pip install --upgrade pip docker jsondiff pyyaml lxml
+# jsondiff pyyaml for community.docker
+# lxml for community.general
+# psycopg2 for community.postgresql
+RUN pip install --upgrade pip docker \
+    jsondiff pyyaml \
+    lxml \
+    psycopg2
 RUN pip install ansible==${ANSIBLE_VERSION}
 RUN mkdir -p /etc/ansible \
     && echo 'localhost' > /etc/ansible/hosts

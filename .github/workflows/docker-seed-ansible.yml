@@ -50,9 +50,9 @@ jobs:
           file: ./ansible/Dockerfile
           platforms: linux/amd64
           build-args: |
-            ANSIBLE_VERSION=2.9.27
+            ANSIBLE_VERSION=6.2.0
             SEED_VERSION=${{ steps.short.outputs.sha_short }}
-          tags: xiaoyao9184/docker-seed-ansible:2.9.27-${{ steps.short.outputs.sha_short }}
+          tags: xiaoyao9184/docker-seed-ansible:6.2.0-${{ steps.short.outputs.sha_short }}
           push: true
       -
         name: Build for tag and push
@@ -63,8 +63,8 @@ jobs:
           file: ./ansible/Dockerfile
           platforms: linux/amd64
           build-args: |
-            ANSIBLE_VERSION=2.9.27
+            ANSIBLE_VERSION=6.2.0
             SEED_VERSION=${{ steps.tag.outputs.tag }}
-          tags: xiaoyao9184/docker-seed-ansible:2.9.27-${{ steps.tag.outputs.tag }}
+          tags: xiaoyao9184/docker-seed-ansible:6.2.0-${{ steps.tag.outputs.tag }}
           push: true
           

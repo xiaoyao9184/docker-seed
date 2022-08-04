@@ -13,7 +13,7 @@ RUN apk add --update --no-cache sudo bash py-pip openssl docker-cli docker-compo
 RUN pip install --upgrade pip docker \
     jsondiff pyyaml \
     lxml \
-    psycopg2
+    psycopg2-binary
 RUN pip install ansible==${ANSIBLE_VERSION}
 RUN mkdir -p /etc/ansible \
     && echo 'localhost' > /etc/ansible/hosts

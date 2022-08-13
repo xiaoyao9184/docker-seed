@@ -52,7 +52,7 @@ jobs:
           build-args: |
             DOCKERIZE_VERSION=0.16.0
             SEED_VERSION=${{ steps.short.outputs.sha_short }}
-          tags: xiaoyao9184/docker-seed-dockerize:0.16.0-${{ steps.short.outputs.sha_short }}
+          tags: xiaoyao9184/docker-seed-dockerize:0.16.0-${{ steps.short.outputs.sha_short }},xiaoyao9184/docker-seed-dockerize:latest
           push: true
       -
         name: Build for tag and push

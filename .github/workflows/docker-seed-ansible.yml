@@ -52,7 +52,7 @@ jobs:
           build-args: |
             ANSIBLE_VERSION=6.2.0
             SEED_VERSION=${{ steps.short.outputs.sha_short }}
-          tags: xiaoyao9184/docker-seed-ansible:6.2.0-${{ steps.short.outputs.sha_short }}
+          tags: xiaoyao9184/docker-seed-ansible:6.2.0-${{ steps.short.outputs.sha_short }},xiaoyao9184/docker-seed-ansible:latest
           push: true
       -
         name: Build for tag and push

@@ -52,7 +52,7 @@ jobs:
           build-args: |
             WAIT4X_VERSION=2.5.0
             SEED_VERSION=${{ steps.short.outputs.sha_short }}
-          tags: xiaoyao9184/docker-seed-wait4x:2.5.0-${{ steps.short.outputs.sha_short }}
+          tags: xiaoyao9184/docker-seed-wait4x:2.5.0-${{ steps.short.outputs.sha_short }},xiaoyao9184/docker-seed-wait4x:latest
           push: true
       -
         name: Build for tag and push

@@ -1,0 +1,20 @@
+{
+  "docker" : {
+    "name": null,
+    "image": "xiaoyao9184/docker-seed-ansible:dev",
+    "entrypoint": null,
+    "command": null
+  },
+  "workspace": {
+    "name": "seed-integration-test-workspace"
+    // "exclude": [
+    //   ""
+    // ]
+  },
+  "key": {
+
+  }
+  // "env": {
+  //   "ANSIBLE_CONFIG": "/workspace/ansible.cfg"
+  // }
+}

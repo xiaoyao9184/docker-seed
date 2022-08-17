@@ -1,0 +1,10 @@
+---
+
+- name: l1
+  hosts: localhost
+  connection: local
+  tasks: 
+  
+    - name: print msg
+      debug: 
+        msg: "good in {{ playbook_dir }}"

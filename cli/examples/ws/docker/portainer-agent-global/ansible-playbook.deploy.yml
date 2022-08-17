@@ -1,0 +1,17 @@
+---
+
+- name: deploy
+  hosts: docker-manager
+  tasks: 
+
+    - name: dir
+      include_tasks: "{{ playbook_dir }}/ansible-tasks.dir.yml"
+      vars:
+        dir_path: docker/portainer-agent-global
+        stack_name: portainer-agent-global
+
+    - name: stack
+      include_tasks: "{{ playbook_dir }}/ansible-tasks.deploy.yml"
+      vars:
+        dir_path: docker/portainer-agent-global
+        stack_name: portainer-agent-global

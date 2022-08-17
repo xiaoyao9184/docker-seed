@@ -1,0 +1,222 @@
+---
+
+- name: add host on local ansible-control
+  hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+
+    - name: chmod for remote ssh key
+      ansible.builtin.file:
+        path: /root/.ssh
+        owner: root
+        group: root
+        mode: '0600'
+        recurse: true
+        
+    - name: add host to inventory
+      ansible.builtin.add_host:
+        name: "{{ host | default('localhost') }}"
+        ansible_user: "{{ user | default('root') }}"
+        groups: remote
+
+- name: docker-seed on remote docker-machine
+  hosts: remote
+  vars:
+    ansible_python_interpreter: /usr/bin/python3
+    host_key_checking: false
+  tasks:
+    
+    - name: print seed env
+      ansible.builtin.debug: 
+        msg:
+          - "SEED_DETACH: {{ lookup('ansible.builtin.env', 'SEED_DETACH') }}"
+          - "SEED_INTERACTIVE: {{ lookup('ansible.builtin.env', 'SEED_INTERACTIVE') }}"
+          - "SEED_TTY: {{ lookup('ansible.builtin.env', 'SEED_TTY') }}"
+          - "SEED_NAME: {{ lookup('ansible.builtin.env', 'SEED_NAME') }}"
+          - "SEED_ENTRYPOINT: {{ lookup('ansible.builtin.env', 'SEED_ENTRYPOINT') }}"
+          - "SEED_IMAGE: {{ lookup('ansible.builtin.env', 'SEED_IMAGE') }}"
+          - "SEED_COMMAND: {{ lookup('ansible.builtin.env', 'SEED_COMMAND') }}"
+        verbosity: 3
+
+    - name: set seed fact
+      ansible.builtin.set_fact:
+        seed:
+          detach: "{{ lookup('ansible.builtin.env', 'SEED_DETACH') | default(seed_detach, true) | default(false, true) }}"
+          interactive: "{{ lookup('ansible.builtin.env', 'SEED_INTERACTIVE') | default(seed_interactive, true) | default(true, true) }}"
+          tty: "{{ lookup('ansible.builtin.env', 'SEED_TTY') | default(seed_tty, true) | default(true, true) }}"
+          name: "{{ lookup('ansible.builtin.env', 'SEED_NAME') | default(seed_name, true) | default('seed-' + (ansible_date_time.iso8601_micro | to_uuid) , true) }}"
+          entrypoint: "{{ lookup('ansible.builtin.env', 'SEED_ENTRYPOINT') | default(seed_entrypoint, true) | default('ansible-playbook', true) }}"
+          image: "{{ lookup('ansible.builtin.env', 'SEED_IMAGE') | default(seed_image, true) | default('xiaoyao9184/docker-seed-ansible:latest', true) }}"
+          command: "{{ lookup('ansible.builtin.env', 'SEED_COMMAND') | default(seed_command, true) | default('--version', true) }}"
+
+    - name: print seed fact
+      ansible.builtin.debug: 
+        var: seed
+
+    - name: create docker info
+      ansible.builtin.set_fact:
+        volume_mapping: []
+     
+    - name: workspace volume
+      vars:
+        workspace:
+          name: "{{ lookup('ansible.builtin.env', 'SEED_WORKSPACE') | default(seed_workspace, true) | default(seed.name, true) }}"
+          src: "{{ lookup('ansible.builtin.env', 'WORKSPACE_SRC') | default('/workspace', true) }}"
+          dest: "/seed/workspace/default"
+      block:
+        - name: set workspace fact
+          vars:
+            ws_update:
+              dest: "/seed/workspace/{{ workspace.name }}"
+          ansible.builtin.set_fact:
+            workspace: "{{ workspace | combine(ws_update, recursive=True) }}"
+
+        - name: print workspace fact
+          ansible.builtin.debug: 
+            var: workspace
+
+        - name: get workspace stat
+          delegate_to: localhost
+          connection: local
+          ansible.builtin.stat:
+            path: "{{ workspace.src }}/.seed/"
+          register: workspace_stat
+
+        - name: print workspace stat
+          ansible.builtin.debug: 
+            var: workspace_stat.stat
+            # verbosity: 3
+
+        - name: mkdir workspace dest
+          ansible.builtin.file:
+            path: "{{ workspace.dest | dirname }}"
+            state: directory
+
+        - name: copy workspace path
+          when: workspace_stat.stat.exists
+          ansible.builtin.copy:
+            src: "{{ workspace.src }}/"
+            dest: "{{ workspace.dest }}"
+            owner: root
+            group: root
+            mode: '0777'
+        
+        - name: create workspace volume
+          when: workspace_stat.stat.exists
+          community.docker.docker_volume:
+            name: "{{ workspace.name }}"
+            driver: local
+            driver_options:
+              type: none
+              device: "{{ workspace.dest }}"
+              o: bind
+
+        - name: add workspace volume_mapping
+          when: workspace_stat.stat.exists
+          ansible.builtin.set_fact:
+            volume_mapping: "{{ volume_mapping + binds }}"
+          vars:
+            binds:
+              - "{{ workspace.name }}:/workspace"
+
+    - name: key volume
+      vars:
+        key:
+          name: "{{ lookup('ansible.builtin.env', 'SEED_KEY') | default(seed_key, true) | default(seed.name, true) }}"
+          src: "{{ lookup('ansible.builtin.env', 'KEY_SRC') | default('/key/.ssh/id_rsa', true) }}"
+          dest: "/seed/key/default/id_rsa"
+      block:
+        - name: set key fact
+          vars:
+            key_update:
+              dest: "/seed/key/{{ key.name }}/id_rsa"
+          ansible.builtin.set_fact:
+            key: "{{ key | combine(key_update, recursive=True) }}"
+
+        - name: print key fact
+          ansible.builtin.debug: 
+            var: key
+
+        - name: get key stat
+          delegate_to: localhost
+          connection: local
+          ansible.builtin.stat:
+            path: "{{ key.src }}"
+          register: key_stat
+
+        - name: print key stat
+          ansible.builtin.debug: 
+            var: key_stat.stat
+            # verbosity: 3
+
+        - name: mkdir key dest
+          ansible.builtin.file:
+            path: "{{ key.dest | dirname }}"
+            state: directory
+        
+        - name: copy key file
+          when: key_stat.stat.exists
+          ansible.builtin.copy:
+            src: "{{ key.src }}"
+            dest: "{{ key.dest }}"
+            owner: root
+            group: root
+            mode: '0600'
+
+        - name: add key to volume_mapping
+          when: key_stat.stat.exists
+          ansible.builtin.set_fact:
+            volume_mapping: "{{ volume_mapping + binds }}"
+          vars:
+            binds:
+              - "{{ key.dest }}:/root/.ssh/id_rsa"
+    
+    - name: print volume_mapping
+      ansible.builtin.debug: 
+        var: volume_mapping
+        # verbosity: 3
+
+    - name: run docker-seed
+      community.docker.docker_container:
+        name: "{{ seed.name }}"
+        state: started
+        privileged: true
+        user: root
+        detach: "{{ seed.detach }}"
+        interactive: "{{ seed.interactive }}"
+        tty: "{{ seed.tty }}"
+        entrypoint: "{{ seed.entrypoint }}"
+        image: "{{ seed.image }}"
+        command: "{{ seed.command }}"
+        volumes: "{{ volume_mapping }}"
+        mounts:
+          - source: "/var/run/docker.sock"
+            target: "/var/run/docker.sock"
+            type: "bind"
+          - source: "/etc/localtime"
+            target: "/etc/localtime"
+            type: "bind"
+            read_only: true
+      register: docker_output
+            
+    - name: print docker_output fact
+      ansible.builtin.debug: 
+        var: docker_output
+        verbosity: 3
+            
+    # - name: print docker_output output
+    #   when: seed.detach == 'false'
+    #   ansible.builtin.debug: 
+    #     msg: "{{ docker_output.container.Output.split('\r\n') }}"
+  
+  # https://stackoverflow.com/questions/34188167/ansible-print-message-debug-msg-line1-n-var2-n-line3-with-var3
+    - name: print docker_output output
+      when: seed.detach == 'false'
+      ansible.builtin.pause:
+        seconds: 1
+        prompt: |
+        
+          SEED [{{ docker_output.container.Name }}] //////////////////////////////////////////////////
+          {{ docker_output.container.Output }}
+          SEED [{{ docker_output.container.Name }}] //////////////////////////////////////////////////

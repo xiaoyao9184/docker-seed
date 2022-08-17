@@ -1,0 +1,11 @@
+all:
+  hosts:
+    localhost:
+  children:
+    docker-manager:
+      hosts:
+        localhost:
+          ansible_connection: local
+      vars:
+        workspace:
+          path: "/workspace"

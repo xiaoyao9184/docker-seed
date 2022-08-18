@@ -13,7 +13,7 @@
         group: root
         mode: '0600'
         recurse: true
-        
+
     - name: add host to inventory
       ansible.builtin.add_host:
         name: "{{ host | default('localhost') }}"
@@ -26,9 +26,9 @@
     ansible_python_interpreter: /usr/bin/python3
     host_key_checking: false
   tasks:
-    
+
     - name: print seed env
-      ansible.builtin.debug: 
+      ansible.builtin.debug:
         msg:
           - "SEED_DETACH: {{ lookup('ansible.builtin.env', 'SEED_DETACH') }}"
           - "SEED_INTERACTIVE: {{ lookup('ansible.builtin.env', 'SEED_INTERACTIVE') }}"
@@ -51,13 +51,13 @@
           command: "{{ lookup('ansible.builtin.env', 'SEED_COMMAND') | default(seed_command, true) | default('--version', true) }}"
 
     - name: print seed fact
-      ansible.builtin.debug: 
+      ansible.builtin.debug:
         var: seed
 
     - name: create docker info
       ansible.builtin.set_fact:
         volume_mapping: []
-     
+
     - name: workspace volume
       vars:
         workspace:
@@ -73,7 +73,7 @@
             workspace: "{{ workspace | combine(ws_update, recursive=True) }}"
 
         - name: print workspace fact
-          ansible.builtin.debug: 
+          ansible.builtin.debug:
             var: workspace
 
         - name: get workspace stat
@@ -84,8 +84,8 @@
           register: workspace_stat
 
         - name: print workspace stat
-          ansible.builtin.debug: 
-            var: workspace_stat.stat
+          ansible.builtin.debug:
+            var: workspace_stat.stat.exists
             # verbosity: 3
 
         - name: mkdir workspace dest
@@ -110,7 +110,7 @@
             delete: yes
             recursive: yes
             checksum: yes
-        
+
         - name: create workspace volume
           when: workspace_stat.stat.exists
           community.docker.docker_volume:
@@ -144,7 +144,7 @@
             key: "{{ key | combine(key_update, recursive=True) }}"
 
         - name: print key fact
-          ansible.builtin.debug: 
+          ansible.builtin.debug:
             var: key
 
         - name: get key stat
@@ -155,15 +155,15 @@
           register: key_stat
 
         - name: print key stat
-          ansible.builtin.debug: 
-            var: key_stat.stat
+          ansible.builtin.debug:
+            var: key_stat.stat.exists
             # verbosity: 3
 
         - name: mkdir key dest
           ansible.builtin.file:
             path: "{{ key.dest | dirname }}"
             state: directory
-        
+
         - name: copy key file
           when: key_stat.stat.exists
           ansible.builtin.copy:
@@ -180,9 +180,9 @@
           vars:
             binds:
               - "{{ key.dest }}:/root/.ssh/id_rsa"
-    
+
     - name: print volume_mapping
-      ansible.builtin.debug: 
+      ansible.builtin.debug:
         var: volume_mapping
         # verbosity: 3
 
@@ -190,6 +190,8 @@
       community.docker.docker_container:
         name: "{{ seed.name }}"
         state: started
+        # https://stackoverflow.com/questions/40625832/using-ansible-docker-container-how-can-i-display-standard-out-stdout
+        timeout: 120
         privileged: true
         user: root
         detach: "{{ seed.detach }}"
@@ -198,6 +200,11 @@
         entrypoint: "{{ seed.entrypoint }}"
         image: "{{ seed.image }}"
         command: "{{ seed.command }}"
+        env:
+          "SEED_NAME": "{{ seed.name }}"
+          "SEED_ENTRYPOINT": "{{ seed.entrypoint }}"
+          "SEED_IMAGE": "{{ seed.image }}"
+          "SEED_COMMAND": "{{ seed.command }}"
         volumes: "{{ volume_mapping }}"
         mounts:
           - source: "/var/run/docker.sock"
@@ -207,25 +214,43 @@
             target: "/etc/localtime"
             type: "bind"
             read_only: true
+        labels:
+          "com.docker.stack.namespace": "seed"
       register: docker_output
-            
-    - name: print docker_output fact
-      ansible.builtin.debug: 
-        var: docker_output
-        verbosity: 3
-            
-    # - name: print docker_output output
-    #   when: seed.detach == 'false'
-    #   ansible.builtin.debug: 
-    #     msg: "{{ docker_output.container.Output.split('\r\n') }}"
-  
-  # https://stackoverflow.com/questions/34188167/ansible-print-message-debug-msg-line1-n-var2-n-line3-with-var3
-    - name: print docker_output output
-      when: seed.detach == 'false'
-      ansible.builtin.pause:
-        seconds: 1
-        prompt: |
-        
-          SEED [{{ docker_output.container.Name }}] //////////////////////////////////////////////////
-          {{ docker_output.container.Output }}
-          SEED [{{ docker_output.container.Name }}] //////////////////////////////////////////////////
+      ignore_errors: yes
+
+    - name: print docker-seed
+      block:
+        - name: print docker-seed container
+          when: docker_output is defined
+          ansible.builtin.debug:
+            var: docker_output
+            # verbosity: 3
+
+        - name: print docker-seed name
+          when: docker_output is undefined
+          ansible.builtin.debug:
+            msg:
+              - "Can't get output log, maybe task takes a long time and ansible timeout."
+              - "Check log on remote docker: {{ inventory_hostname }} container: {{ seed.name }}."
+
+        - name: print docker-seed name
+          when:
+            - docker_output is defined
+            - seed.detach == 'true'
+          ansible.builtin.debug:
+            msg:
+              - "Check log on remote docker: {{ inventory_hostname }} container: {{ docker_output.container.Name }}."
+
+        - name: print docker-seed output
+          when:
+            - docker_output is defined
+            - seed.detach == 'false'
+          # https://stackoverflow.com/questions/34188167/ansible-print-message-debug-msg-line1-n-var2-n-line3-with-var3
+          ansible.builtin.pause:
+            seconds: 1
+            prompt: |
+
+              SEED [{{ docker_output.container.Name }}] //////////////////////////////////////////////////
+              {{ docker_output.container.Output }}
+              SEED [{{ docker_output.container.Name }}] //////////////////////////////////////////////////

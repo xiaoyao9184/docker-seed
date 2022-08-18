@@ -93,14 +93,23 @@
             path: "{{ workspace.dest | dirname }}"
             state: directory
 
-        - name: copy workspace path
+        # - name: copy workspace path
+        #   when: workspace_stat.stat.exists
+        #   ansible.builtin.copy:
+        #     src: "{{ workspace.src }}/"
+        #     dest: "{{ workspace.dest }}"
+        #     owner: root
+        #     group: root
+        #     mode: '0777'
+
+        - name: sync workspace path
           when: workspace_stat.stat.exists
-          ansible.builtin.copy:
+          ansible.posix.synchronize:
             src: "{{ workspace.src }}/"
             dest: "{{ workspace.dest }}"
-            owner: root
-            group: root
-            mode: '0777'
+            delete: yes
+            recursive: yes
+            checksum: yes
         
         - name: create workspace volume
           when: workspace_stat.stat.exists

@@ -5,7 +5,10 @@ FROM alpine:3.16
 ARG ANSIBLE_VERSION=6.2.0
 ARG SEED_VERSION=dev
 
-RUN apk add --update --no-cache sudo bash py-pip openssh openssl docker-cli docker-compose
+RUN apk add --update --no-cache \
+    sudo bash \
+    py-pip openssh openssl rsync \
+    docker-cli docker-compose
 
 # jsondiff pyyaml for community.docker
 # lxml for community.general

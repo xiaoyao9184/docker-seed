@@ -144,6 +144,13 @@ function Start-SeedDocker() {
                 target = '/root/.ssh'
             }) | Out-Null
         }
+
+        if($background){
+            $docker.detach = $true
+        } else {
+            $docker.interactive = $true
+            $docker.tty = $true
+        }
     } else {
         # key path bind to /root/.ssh path
         $_ssh_path = Resolve-Path -Path "$env:USERPROFILE/.ssh/"
@@ -152,8 +159,10 @@ function Start-SeedDocker() {
             target = '/root/.ssh'
         }) | Out-Null
 
+        # remote background will just for remote, local will auto remove
         $docker.rm = $true
-
+        $docker.interactive = $true
+        $docker.tty = $true
         if ($background) {
             $docker.env.Add(@{
                 name = 'SEED_DETACH'
@@ -188,7 +197,7 @@ function Start-SeedDocker() {
             target = '/docker-seed.yml'
         }) | Out-Null
 
-
+        # remote will replace 'image' 'entrypoint' 'command'
         $docker.entrypoint = 'ansible-playbook'
         $docker.image = $remote_seed_image
         
@@ -208,13 +217,6 @@ function Start-SeedDocker() {
             $_remote_host = $user_host[0]
         }
         $docker.command = "$_verbose --extra-vars 'user=$_remote_user host=$_remote_host' /docker-seed.yml"
-    }
-
-    if($background){
-        $docker.detach = $true
-    } else {
-        $docker.interactive = $true
-        $docker.tty = $true
     }
 
     $parameters = @{

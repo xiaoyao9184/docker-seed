@@ -89,6 +89,7 @@
             # verbosity: 3
 
         - name: mkdir workspace dest
+          when: workspace_stat.stat.exists
           ansible.builtin.file:
             path: "{{ workspace.dest | dirname }}"
             state: directory
@@ -160,6 +161,7 @@
             # verbosity: 3
 
         - name: mkdir key dest
+          when: key_stat.stat.exists
           ansible.builtin.file:
             path: "{{ key.dest | dirname }}"
             state: directory

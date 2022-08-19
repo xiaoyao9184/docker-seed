@@ -4,17 +4,17 @@
     "image": "xiaoyao9184/docker-seed-ansible:dev",
     "entrypoint": null,
     "command": null
+    // "env": {
+    //   "ANSIBLE_CONFIG": "/workspace/ansible.cfg"
+    // }
   },
   "workspace": {
     "name": "seed-integration-test-workspace"
-    // "exclude": [
-    //   ""
-    // ]
   },
   "key": {
 
+  },
+  "entrypoint_image_alias": {
+    "ansible-inventory": "xiaoyao9184/docker-seed-ansible:dev"
   }
-  // "env": {
-  //   "ANSIBLE_CONFIG": "/workspace/ansible.cfg"
-  // }
 }

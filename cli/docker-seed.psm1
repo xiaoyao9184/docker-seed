@@ -235,12 +235,28 @@ function Convert-ImageName {
     param (
         [Parameter(Mandatory = $true,Position = 0)]
         [string] $entrypoint
+        ,
+        [Parameter(Mandatory = $true,Position = 1,ValueFromRemainingArguments = $true)]
+        [PSCustomObject[]] $alias
     )
     
-    if ($entrypoint_image_alias.ContainsKey($entrypoint)) {
-        $image = $entrypoint_image_alias[$entrypoint]
+    $_img = $alias | Where-Object {
+        $_.ContainsKey($entrypoint)
+    } | ForEach-Object { 
+        $_[$entrypoint]
+    } | Select-Object -Last 1
 
-        return "${image}:latest"
+    $_rep_tag = $_img -Split ':'
+    if ($_rep_tag.Count -eq 2) {
+        $_rep = $_rep_tag[0]
+        $_tag = $_rep_tag[1]
+    } else {
+        $_rep = $_rep_tag[0]
+        $_tag = 'latest'
+    }
+
+    if ($_rep) {
+        return "${_rep}:${_tag}"
     } else {
         Write-Error -Message "Use the '-Image' parameter to force the use of the specified image"
         Write-Error -Message ($entrypoint | Format-Table | Out-String)
@@ -470,6 +486,7 @@ function Merge-SeedParam {
                 enable = $false
                 path = $null
             }
+            entrypoint_image_alias = @{}
         }
     }
     if ($seed) {
@@ -561,7 +578,8 @@ function Select-DockerSeed {
         $Command = Convert-CommandPath -Command $Command -Workspace $Workspace -Key $Key
 
         if (! $Image) {
-            $Image = Convert-ImageName -entrypoint $Entrypoint
+            $Image = Convert-ImageName -entrypoint $Entrypoint `
+                -alias $entrypoint_image_alias,$Seed.entrypoint_image_alias
         }
         if ($Image) {
             $Seed.docker.image = $Image

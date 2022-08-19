@@ -223,22 +223,22 @@
 
     - name: print docker-seed
       block:
-        - name: print docker-seed container
-          when: docker_output is defined
-          ansible.builtin.debug:
-            var: docker_output
-            # verbosity: 3
-
         - name: print docker-seed name
-          when: docker_output is undefined
+          when: docker_output.failed
           ansible.builtin.debug:
             msg:
               - "Can't get output log, maybe task takes a long time and ansible timeout."
               - "Check log on remote docker: {{ inventory_hostname }} container: {{ seed.name }}."
 
+        - name: print docker-seed container
+          when: not docker_output.failed
+          ansible.builtin.debug:
+            var: docker_output
+            # verbosity: 3
+
         - name: print docker-seed name
           when:
-            - docker_output is defined
+            - not docker_output.failed
             - seed.detach == 'true'
           ansible.builtin.debug:
             msg:
@@ -246,7 +246,7 @@
 
         - name: print docker-seed output
           when:
-            - docker_output is defined
+            - not docker_output.failed
             - seed.detach == 'false'
           # https://stackoverflow.com/questions/34188167/ansible-print-message-debug-msg-line1-n-var2-n-line3-with-var3
           ansible.builtin.pause:

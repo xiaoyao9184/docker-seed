@@ -27,33 +27,33 @@ after that docker-seed can guess the `Image` that needs to be run through the `E
 The following is to specify the `Entrypoint` parameter by shorthand `-e`
 
 ```powershell
-docker-seed -e dockerize ...
-docker-seed -e wait4x ...
-docker-seed -e ansibe ...
-docker-seed -e ansibe-playbook ...
+seed-docker -e dockerize ...
+seed-docker -e wait4x ...
+seed-docker -e ansibe ...
+seed-docker -e ansibe-playbook ...
 ```
 
 Only these 4 `Entrypoint` can be guessed `Image`,
 for other , you must to specify via `-image`, `-img` or `-i`
 
 ```powershell
-docker-seed -image xiaoyao9184/docker-seed-ansible:latest ...
+seed-docker -image xiaoyao9184/docker-seed-ansible:latest ...
 ```
 
 It also supports the following parameters, see [parameters](#parameters)
 
 ```powershell
-docker-seed -on localhost ...
-docker-seed -name seed-for-deploy-pgsql ...
-docker-seed -workspace $PWD/examples/ws ...
-docker-seed -key $env:USERPROFILE/.ssh/id_rsa ...
-docker-seed -background ...
+seed-docker -on localhost ...
+seed-docker -name seed-for-deploy-pgsql ...
+seed-docker -workspace $PWD/examples/ws ...
+seed-docker -key $env:USERPROFILE/.ssh/id_rsa ...
+seed-docker -background ...
 ```
 
 Also supports positional parameters, simplified like this
 
 ```powershell
-docker-seed ansibe-playbook $PWD/examples/ws/docker/portainer-agent-global/ansible-playbook.deploy.yml
+seed-docker ansibe-playbook $PWD/examples/ws/docker/portainer-agent-global/ansible-playbook.deploy.yml
 ```
 
 
@@ -187,7 +187,7 @@ because the commands used by `docker-seed` are directly available in linux.
 
 The only difference is that `docker-seed` supports sending seed container to run on a remote docker machine.
 
-Its implementation principle is to run a [docker-seed.yml](.docker-seed.yml) playbook through the `ansible-playbook` command.
+Its implementation principle is to run a [seed-remote.yml](.seed-remote.yml) playbook through the `ansible-playbook` command.
 
 The following bash script is the core principle, you can run it in wsl.
 
@@ -203,12 +203,12 @@ SEED_NAME=seed-$(cat /proc/sys/kernel/random/uuid) \
 SEED_ENTRYPOINT=ansible-playbook \
 SEED_IMAGE=xiaoyao9184/docker-seed-ansible:latest \
 SEED_COMMAND=l1/ansible-playbook.yml \
-ansible-playbook --extra-vars host=localhost docker-seed.yml
+ansible-playbook --extra-vars host=localhost seed-remote.yml
 ```
 
 The windows pwsh equivalent to this script is as follows
 
 ```powershell
-docker-seed -ws $PWD/examples/ws -key $env:USERPROFILE/.ssh/id_rsa `
+seed-docker -ws $PWD/examples/ws -key $env:USERPROFILE/.ssh/id_rsa `
     -e ansible-playbook -cmd $PWD/examples/ws/ansible-playbook.yml
 ```

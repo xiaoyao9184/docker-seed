@@ -57,7 +57,7 @@
     # RequiredAssemblies = @()
     
     # Script files (.ps1) that are run in the caller's environment prior to importing this module.
-    ScriptsToProcess = @("seed-ssh.ps1")
+    ScriptsToProcess = @("seed-docker.ps1","seed-ssh.ps1")
     
     # Type files (.ps1xml) to be loaded when importing this module
     # TypesToProcess = @()
@@ -87,7 +87,7 @@
     # ModuleList = @()
     
     # List of all files packaged with this module
-    FileList = @("docker-seed.yml")
+    FileList = @("seed-remote.yml")
     
     # Private data to pass to the module specified in RootModule/ModuleToProcess. This may also contain a PSData hashtable with additional module metadata used by PowerShell.
     PrivateData = @{

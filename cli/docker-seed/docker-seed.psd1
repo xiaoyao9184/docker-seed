@@ -15,7 +15,7 @@
     ModuleVersion = '0.0.1'
     
     # Supported PSEditions
-    # CompatiblePSEditions = @()
+    CompatiblePSEditions = @('PSEdition_Core')
     
     # ID used to uniquely identify this module
     GUID = '2f4757f5-3479-4ba8-8555-b1323f506f79'
@@ -30,10 +30,10 @@
     Copyright = '(c) xiaoyao9184. All rights reserved.'
     
     # Description of the functionality provided by this module
-    # Description = ''
+    Description = 'docker-seed cli'
     
     # Minimum version of the PowerShell engine required by this module
-    # PowerShellVersion = ''
+    PowerShellVersion = '7.0'
     
     # Name of the PowerShell host required by this module
     # PowerShellHostName = ''
@@ -69,16 +69,16 @@
     # NestedModules = @()
     
     # Functions to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no functions to export.
-    FunctionsToExport = '*'
+    FunctionsToExport = @('Invoke-SeedDocker','Invoke-SeedSSH')
     
     # Cmdlets to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no cmdlets to export.
-    CmdletsToExport = @()
+    # CmdletsToExport = @()
     
     # Variables to export from this module
-    VariablesToExport = '*'
+    # VariablesToExport = '*'
     
     # Aliases to export from this module, for best performance, do not use wildcards and do not delete the entry, use an empty array if there are no aliases to export.
-    AliasesToExport = '*'
+    AliasesToExport = @('seed-docker','seed-ssh')
     
     # DSC resources to export from this module
     # DscResourcesToExport = @()
@@ -95,13 +95,13 @@
         PSData = @{
     
             # Tags applied to this module. These help with module discovery in online galleries.
-            # Tags = @()
+            Tags = @('docker','seed','remote','ansible','dockerize','wait4x')
     
             # A URL to the license for this module.
             # LicenseUri = ''
     
             # A URL to the main website for this project.
-            # ProjectUri = ''
+            ProjectUri = 'https://github.com/xiaoyao9184/docker-seed'
     
             # A URL to an icon representing this module.
             # IconUri = ''
@@ -128,6 +128,6 @@
     # Default prefix for commands exported from this module. Override the default prefix using Import-Module -Prefix.
     # DefaultCommandPrefix = ''
     
-    }
+}
     
     

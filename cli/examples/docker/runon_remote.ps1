@@ -1,4 +1,4 @@
-Import-Module $PSScriptRoot\..\..\docker-seed.psd1 -force
+Import-Module $PSScriptRoot\..\..\docker-seed\docker-seed.psd1 -force
 
 seed-docker -on ub.lan -e dockerize --help
 seed-docker -on ub.lan -e ansible-playbook --help

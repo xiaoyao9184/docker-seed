@@ -212,3 +212,16 @@ The windows pwsh equivalent to this script is as follows
 seed-docker -ws $PWD/examples/ws -key $env:USERPROFILE/.ssh/id_rsa `
     -e ansible-playbook -cmd $PWD/examples/ws/ansible-playbook.yml
 ```
+
+
+## continue to develop
+
+test module manifest
+
+```powershell
+".\docker-seed\docker-seed.psd1" | Test-ModuleManifest | Format-List
+```
+
+```powershell
+Publish-Module -Path ".\docker-seed" -NuGetApiKey "?" -Force
+```

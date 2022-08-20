@@ -1,4 +1,4 @@
-Import-Module $PSScriptRoot\..\..\docker-seed.psd1 -force
+Import-Module $PSScriptRoot\..\..\docker-seed\docker-seed.psd1 -force
 
 $script_dir = Split-Path -parent $MyInvocation.MyCommand.Definition
 

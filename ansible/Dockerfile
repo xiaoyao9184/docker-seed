@@ -10,10 +10,12 @@ RUN apk add --update --no-cache \
     py-pip openssh openssl rsync \
     docker-cli docker-compose
 
+# jmespath for json_query filter
 # jsondiff pyyaml for community.docker
 # lxml for community.general
 # psycopg2 for community.postgresql
 RUN pip install --upgrade pip docker \
+    jmespath \
     jsondiff pyyaml \
     lxml \
     psycopg2-binary

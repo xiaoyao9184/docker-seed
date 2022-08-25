@@ -347,7 +347,8 @@ function Convert-WorkspaceVolume {
     $r = docker volume create --name $name `
             --opt type=none `
             --opt device=$path `
-            --opt o=bind
+            --opt o=bind `
+            --label com.docker.stack.namespace=seed
     
     Write-Debug "Init $name workspace"
 

@@ -121,6 +121,8 @@
               type: none
               device: "{{ workspace.dest }}"
               o: bind
+            labels:
+              "com.docker.stack.namespace": "seed"
 
         - name: add workspace volume_mapping
           when: workspace_stat.stat.exists

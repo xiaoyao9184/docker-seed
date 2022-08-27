@@ -94,15 +94,6 @@
             path: "{{ workspace.dest | dirname }}"
             state: directory
 
-        # - name: copy workspace path
-        #   when: workspace_stat.stat.exists
-        #   ansible.builtin.copy:
-        #     src: "{{ workspace.src }}/"
-        #     dest: "{{ workspace.dest }}"
-        #     owner: root
-        #     group: root
-        #     mode: '0777'
-
         - name: sync workspace path
           when: workspace_stat.stat.exists
           ansible.posix.synchronize:
@@ -123,6 +114,8 @@
               o: bind
             labels:
               "com.docker.stack.namespace": "seed"
+              "com.github.xiaoyao9184.docker-seed.type": "workspace"
+              "com.github.xiaoyao9184.docker-seed.creator": "{{ lookup('ansible.builtin.env', 'SEED_NAME', default='docker-seed-playbook') }}"
 
         - name: add workspace volume_mapping
           when: workspace_stat.stat.exists
@@ -220,6 +213,8 @@
             read_only: true
         labels:
           "com.docker.stack.namespace": "seed"
+          "com.github.xiaoyao9184.docker-seed.type": "docker"
+          "com.github.xiaoyao9184.docker-seed.creator": "{{ lookup('ansible.builtin.env', 'SEED_NAME', default='docker-seed-playbook') }}"
       register: docker_output
       ignore_errors: yes
 

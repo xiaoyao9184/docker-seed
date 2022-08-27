@@ -21,6 +21,8 @@ function Get-DockerRunCommand {
         $docker_command.Add("--privileged") | Out-Null
         $docker_command.Add("--user root") | Out-Null
         $docker_command.Add("--label com.docker.stack.namespace=seed") | Out-Null
+        $docker_command.Add("--label com.github.xiaoyao9184.docker-seed.type=docker") | Out-Null
+        $docker_command.Add("--label com.github.xiaoyao9184.docker-seed.creator=docker-seed-cli") | Out-Null
         
         if ($docker.env) {
             $docker.env | ForEach-Object {
@@ -348,7 +350,10 @@ function Convert-WorkspaceVolume {
             --opt type=none `
             --opt device=$path `
             --opt o=bind `
-            --label com.docker.stack.namespace=seed
+            --label com.docker.stack.namespace=seed `
+            --label com.github.xiaoyao9184.docker-seed.type=workspace `
+            --label com.github.xiaoyao9184.docker-seed.creator=docker-seed-cli
+            
     
     Write-Debug "Init $name workspace"
 

@@ -109,7 +109,8 @@ function Add-Key($ssh_destination,$ssh_options) {
     Write-Output ""
     Write-Output "generate ssh rsa key on target '${ssh_destination}'"
 
-    ssh -t "$ssh_options" "$ssh_destination" "ssh-keygen -t rsa -b 2048 -f ~/.ssh/id_rsa -q -P ''"
+    # https://serverfault.com/questions/939909/ssh-keygen-does-not-create-rsa-private-key
+    ssh -t "$ssh_options" "$ssh_destination" "ssh-keygen -m PEM -t rsa -b 2048 -f ~/.ssh/id_rsa -q -P ''"
 
 }
 

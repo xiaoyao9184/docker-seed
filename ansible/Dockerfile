@@ -7,7 +7,7 @@ ARG SEED_VERSION=dev
 
 RUN apk add --update --no-cache \
     sudo bash \
-    py-pip openssh openssl rsync \
+    py-pip openssh openssl rsync git \
     docker-cli docker-compose
 
 # jmespath for json_query filter

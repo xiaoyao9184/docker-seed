@@ -12,13 +12,11 @@ function Add-Workspace($path, $name) {
     }
 
     $text=@"
-
 {
   "workspace": {
     "name": $name
   }
 }
-
 "@
     Add-Content -Path "$path/.seed/seed.json" "$text"
 

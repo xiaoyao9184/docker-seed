@@ -15,6 +15,7 @@ RUN apk add --update --no-cache \
 # lxml for community.general
 # psycopg2 for community.postgresql
 RUN pip install --upgrade pip docker \
+    docker-compose \
     jmespath \
     jsondiff pyyaml \
     lxml \
@@ -25,7 +26,7 @@ RUN mkdir -p /etc/ansible \
 
 RUN ansible-galaxy collection install community.docker \
     && ansible-galaxy collection install community.general \
-    && ansible-galaxy install gekmihesg.openwrt \
+    && ansible-galaxy role install gekmihesg.openwrt \
     && ansible-galaxy collection install imp1sh.ansible_openwrt
 
 COPY docker-entrypoint.sh /docker-entrypoint.sh

@@ -48,7 +48,7 @@ jobs:
         with:
           context: ./wait4x
           file: ./wait4x/Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           build-args: |
             WAIT4X_VERSION=2.5.0
             SEED_VERSION=${{ steps.short.outputs.sha_short }}
@@ -61,7 +61,7 @@ jobs:
         with:
           context: ./wait4x
           file: ./wait4x/Dockerfile
-          platforms: linux/amd64
+          platforms: linux/amd64,linux/arm64
           build-args: |
             WAIT4X_VERSION=2.5.0
             SEED_VERSION=${{ steps.tag.outputs.tag }}

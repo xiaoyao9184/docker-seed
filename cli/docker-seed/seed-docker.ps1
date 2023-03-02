@@ -365,9 +365,17 @@ function Read-WorkspaceParam {
         [Parameter(Mandatory = $true,Position = 0)]
         [string] $Workspace
     )
+    $ws_meta_file = Join-Path -Path $Workspace -ChildPath "seed.json"
+    
+    $ex = Test-Path -Path $ws_meta_file
+    if ($ex) {
+        return Get-Content $ws_meta_file | ConvertFrom-Json
+    }
+    
+    # deprecated not recommended use
     $ws_meta_path = Join-Path -Path $Workspace -ChildPath ".seed"
     $ws_meta_file = Join-Path -Path $ws_meta_path -ChildPath "seed.json"
-
+    
     $ex = Test-Path -Path $ws_meta_file
     if ($ex) {
         return Get-Content $ws_meta_file | ConvertFrom-Json

@@ -18,7 +18,10 @@ function Add-Workspace($path, $name) {
   }
 }
 "@
+    # deprecated not recommended use
     Add-Content -Path "$path/.seed/seed.json" "$text"
+    # recommended this
+    Add-Content -Path "$path/seed.json" "$text"
 
     Write-Output ""
     Write-Output "add done"

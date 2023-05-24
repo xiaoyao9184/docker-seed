@@ -5,6 +5,7 @@ shopt -s extglob
 # environment variable extract param name
 # 1. Remove prefix ANSIBLE_
 # 1.1 if env contains period (.) remove characters after this
+# 1.2 if env endwith underscore (_) with number remove endwith
 # 2. Replace name an underscore (_) with dash (-).
 # 3. Lower case
 # 
@@ -18,7 +19,7 @@ function function_param_parse() {
 
     if [[ "${ansible_param_name//./}" != "$ansible_param_name" ]]; then
         # recreate name remove 
-        ansible_param_name="${NAME//.*/}"
+        ansible_param_name="${ansible_param_name//.*/}"
     elif [[ "${ansible_param_name/%_*([0-9])/}" != "$ansible_param_name" ]]; then
         # recreate name remove 
         ansible_param_name="${ansible_param_name/%_*([0-9])/}"

@@ -5,6 +5,7 @@ shopt -s extglob
 # environment variable extract param name
 # 1. Remove prefix DOCKERIZE_
 # 1.1 if env contains period (.) remove characters after this
+# 1.2 if env endwith underscore (_) with number remove endwith
 # 2. Replace name an underscore (_) with dash (-).
 # 3. Lower case
 # 
@@ -18,7 +19,7 @@ function function_param_parse() {
 
     if [[ "${dockerize_param_name//./}" != "$dockerize_param_name" ]]; then
         # recreate name remove 
-        dockerize_param_name="${NAME//.*/}"
+        dockerize_param_name="${dockerize_param_name//.*/}"
     elif [[ "${dockerize_param_name/%_*([0-9])/}" != "$dockerize_param_name" ]]; then
         # recreate name remove 
         dockerize_param_name="${dockerize_param_name/%_*([0-9])/}"
